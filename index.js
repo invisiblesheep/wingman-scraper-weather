@@ -69,12 +69,27 @@ function runModelOnWeatherReport(input){
         console.log(`stderr: ${stderr}`);
 
         var story = "";
+        var impact = "";
         if (stdout[2] === '0') {
             story = "Weather normal at HEL"
+            impact = '0';
         } else if(stdout[2] === '1') {
             story = "Weather caution at HEL"
-        } else {
+            impact = '1';
+        } else if(stdout[2] === '-'){
+            if (stdout[3] === '1'){
+                story = "Weather caution at HEL"
+                impact = '1';
+            } else {
+                story = "Weather warning at HEL"
+                impact = '2';
+            }
+        } else if(stdout[2] === '2'){
             story = "Weather warning at HEL"
+            impact = '2';
+        } else {
+            story = "Weather alert at HEL"
+            impact = '3';
         }
 
         let today = new Date();
@@ -87,7 +102,7 @@ function runModelOnWeatherReport(input){
         wing.story = story;
         wing.url = 'weatherscraper';
         wing.categories = 'weather';
-        wing.impact = stdout[2];
+        wing.impact = impact;
         wing.source = 'weather-scraper';
 
         request({
